@@ -1,3 +1,5 @@
+
+
 //
 //  main.cpp
 //  randomeAlgo
@@ -11,107 +13,84 @@
 #include <random>
 #include <time.h>
 #include <list>
-
+#include <queue>
 using namespace::std;
 
 
-vector<vector<int>> build_random_graph(float p,int v)
+vector<vector<int>> build_random_graph(float p, int v)
 {
-    
-    
-    
-    
-    
- //allocate dynamic matrix with size v*v
+
+    //allocate dynamic matrix with size v*v
     vector<vector<int>> mat(v);
-        for (int i = 0 ; i < v ; i++)
-            mat[i].resize(v);
-    
-    
-    
-    
-    
-    
-    
+    for (int i = 0; i < v; i++)
+        mat[i].resize(v);
 
-//    int **mat=new int*[v];
-//    for (int i=0;i<v;i++)
-//    {
-//        mat[i]=new int[v];
-//        for(int j=0;j<v;j++)
-//        {
-//            mat[i][j]=0; //initialize to 0
-//        }
-//
-//    }
-    
-    
-    
-    int tempP=p*100; //multiply the probability to get valid number between 1 to 100
-    srand (time(0)); //to generate new random numbers with each run
 
-    for (int i=0;i<v;i++)
+    int tempP = p * 100; //multiply the probability to get valid number between 1 to 100
+    srand(time(0)); //to generate new random numbers with each run
+
+    for (int i = 0; i < v; i++)
     {
-        for(int j=i+1;j<v;j++)
+        for (int j = i + 1; j < v; j++)
         {
-            int num  = rand() % 100 + 1; //generate numbers between 1 to 100
-            if(num<=tempP)
+            int num = rand() % 100 + 1; //generate numbers between 1 to 100
+            if (num <= tempP)
             {
-                mat[i][j]=1; //1 mean that vertex are connected both ways
-                mat[j][i]=1;
+                mat[i][j] = 1; //1 mean that vertex are connected both ways
+                mat[j][i] = 1;
             }
         }
     }
     //print the Graph
-    for(int i=0;i<v;i++)
+    for (int i = 0; i < v; i++)
     {
-        cout<<" "<<i+1 <<" => [";
-        for(int j=0;j<v;j++)
+        cout << " " << i + 1 << " => [";
+        for (int j = 0; j < v; j++)
         {
 
 
-            if(mat[i][j]!=0)
+            if (mat[i][j] != 0)
             {
-                cout<<" "<<j+1<<" ";
+                cout << " " << j + 1 << " ";
             }
         }
 
-        cout<<"]\n";
+        cout << "]\n";
     }
-    
-    
 
-    cout<<"\n";
-    for(int i=0;i<v;i++)
+
+
+    cout << "\n";
+    for (int i = 0; i < v; i++)
     {
 
-        for(int j=0;j<v;j++)
+        for (int j = 0; j < v; j++)
         {
-            cout<<mat[i][j] <<" ";
+            cout << mat[i][j] << " ";
 
         }
-        cout<<"\n";
+        cout << "\n";
     }
 
-    
 
-    
+
+
     return mat;
 }
 
 bool is_isolated(vector<vector<int>> graph)
 {
-    int sum=0;
-    for(int i=0;i<graph.size();i++){
-        for(int j=0;j<graph[i].size();j++)
+    int sum = 0;
+    for (int i = 0; i < graph.size(); i++) {
+        for (int j = 0; j < graph[i].size(); j++)
         {
-            sum+=graph[i][j];
+            sum += graph[i][j];
         }
-        if(sum==0)
+        if (sum == 0)
         {
             return true;
         }
-        sum=0;
+        sum = 0;
     }
 
     //cout<<n<<"\n";
@@ -120,38 +99,64 @@ bool is_isolated(vector<vector<int>> graph)
 }
 bool connectivity(vector<vector<int>> randomGraph)
 {
-    bool n= is_isolated(randomGraph);
-    if(n)
+    bool n = is_isolated(randomGraph);
+    if (n)
     {
-        cout<<"graph is not connected "<<endl;
-        
+        cout << "graph is not connected " << endl;
+
         return false;
     }
-    cout<<"graph is conected  "<<endl;
+    cout << "graph is conected  " << endl;
     return true;
-    
+
 }
 
-//int diameter1(vector<vector<int>> graph)
-//{
-//    int counter=0;
-//    int max=0;
-//    vector<int>temp(graph.size());
-//    for(int k=0;k<graph.size()
-//    for(int i=0;i<graph.size();i++){
-//        for(int j=0;j<graph.size();j++){
-//            if(graph[i][j]==1){
-//                temp[j]=1;
-//            }
-//            counter++;
-//        }
-//    }
-//    return 0;
-//}
+int BFS(vector<vector<int>> graph,int v) {
+    vector<int> distance(graph.size());
+    queue<int> a;
+    vector<bool> visited(graph.size());
+    for (int k = 0; k < graph.size(); k++) {
+        visited[k] = false;
+    }
+    a.push(v);
+    distance[v] = 0;
+    visited[v] = true;
+    while (!a.empty()) {
+        for (int i = 0; i < graph.size(); i++) {
+            if (graph[v][i] == 1 && visited[i] == false) {
+                a.push(i);
+                distance[i] = distance[a.front()] + 1;
+                visited[i] = true;
+            }
+        }
+        a.pop();
+        if (!a.empty()) {
+            v = a.front();
+        }
+    }
+    return distance[v];
+}
+
+int diameter(vector<vector<int>> graph) {
+    if (connectivity(graph)) {
+        int max = 0;
+        int diam = 0;
+        for (int i = 0; i < graph.size(); i++) {
+            diam = BFS(graph, i);
+            if (diam > max) {
+                max = diam;
+            }
+        }
+        return max;
+    }
+    return INT_MAX;
+}
+
 int main()
 {
-    vector<vector<int>> randomGraph=build_random_graph(0.5,5);
-    bool n=connectivity(randomGraph);
-    ///int d=diameter1(randomGraph);
+    vector<vector<int>> randomGraph = build_random_graph(0.5, 6);
+    //bool n = connectivity(randomGraph);
+    cout<<"diam is: "<<diameter(randomGraph)<<endl;
     return  0;
 }
+
